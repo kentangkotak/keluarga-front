@@ -1,9 +1,9 @@
 <template>
   <div class="tree-wrapper">
     <!-- TOP BAR -->
-    <div class="top-bar">
+    <!-- <div class="top-bar">
       <q-btn icon="arrow_back" label="Home" color="primary" unelevated rounded @click="goHome" />
-    </div>
+    </div> -->
 
     <!-- HEADER -->
     <div class="tree-header">
@@ -11,13 +11,29 @@
       <div class="subtitle">Struktur Keturunan Keluarga</div>
     </div>
 
-    <q-btn
-      label="Tambah Anggota"
-      color="positive"
-      icon="add"
-      class="q-mb-md"
-      @click="showDialog = true"
-    />
+    <div class="row q-pl-md q-pr-md">
+      <div class="col-6 q-pr-md">
+        <q-btn
+          icon="arrow_back"
+          label="Home"
+          color="primary"
+          unelevated
+          rounded
+          @click="goHome"
+          class="q-mb-md full-width"
+        />
+      </div>
+      <div class="col-6">
+        <q-btn
+          label="Tambah Anggota"
+          color="positive"
+          icon="add"
+          rounded
+          class="q-mb-md full-width"
+          @click="openTambah"
+        />
+      </div>
+    </div>
 
     <!-- TREE CANVAS -->
     <div ref="canvas" class="tree-container"></div>
@@ -52,6 +68,11 @@ const goHome = () => {
   router.push('/')
 }
 
+const openTambah = () => {
+  selectedMember.value = null // WAJIB RESET
+  showDialog.value = true
+}
+
 /* =========================
    RENDER FUNCTION
 ========================= */
@@ -62,8 +83,8 @@ const renderTree = async (data) => {
 
   d3.select(canvas.value).selectAll('*').remove()
 
-  const width = 1600
-  const height = 1000
+  const width = canvas.value.scrollWidth || canvas.value.clientWidth
+  const height = 1200
 
   const svg = d3.select(canvas.value).append('svg').attr('width', width).attr('height', height)
 
@@ -81,7 +102,7 @@ const renderTree = async (data) => {
   const root = d3.hierarchy(data)
 
   // 🔥 SPACING BESAR BIAR GAK KETUMPUK
-  const treeLayout = d3.tree().nodeSize([420, 300])
+  const treeLayout = d3.tree().nodeSize([420, 180])
   treeLayout(root)
 
   // 🔥 AUTO CENTER
@@ -105,17 +126,20 @@ const renderTree = async (data) => {
     .attr('stroke-linecap', 'round')
     .attr('opacity', 0.9)
     .attr('d', (d) => {
-      const startX = d.source.x + 180 / 2
-      const startY = d.source.y + 170
-      const endX = d.target.x + 180 / 2
+      const cardWidth = 100
+      const cardHeight = 100
+
+      const startX = d.source.x + cardWidth / 2
+      const startY = d.source.y + cardHeight
+      const endX = d.target.x + cardWidth / 2
       const endY = d.target.y
 
       return `
-        M ${startX},${startY}
-        V ${(startY + endY) / 2}
-        H ${endX}
-        V ${endY}
-      `
+    M ${startX},${startY}
+    V ${(startY + endY) / 2}
+    H ${endX}
+    V ${endY}
+  `
     })
 
   const node = g
@@ -126,79 +150,62 @@ const renderTree = async (data) => {
     .attr('transform', (d) => `translate(${d.x},${d.y})`)
 
   /* =========================
-     CARD UTAMA
-  ========================= */
+   CARD UTAMA (ULTRA COMPACT)
+========================= */
   node.each(function (d) {
     const card = d3.select(this)
 
-    const cardWidth = 180
-    const cardHeight = 170
+    const cardWidth = 100
+    const cardHeight = 100
 
     const bgColor = d.data.kelamin === 'Laki-laki' ? '#1976d2' : '#e91e63'
+
     card.style('cursor', 'pointer').on('click', () => {
       selectedMember.value = d.data
       showDialog.value = true
     })
 
+    // Background
     card
       .append('rect')
       .attr('width', cardWidth)
       .attr('height', cardHeight)
-      .attr('rx', 18)
+      .attr('rx', 12)
       .attr('fill', bgColor)
-      .attr('filter', 'drop-shadow(0px 6px 15px rgba(0,0,0,0.15))')
+      .attr('filter', 'drop-shadow(0px 3px 8px rgba(0,0,0,0.12))')
 
+    // Foto
     card
       .append('image')
-      .attr('href', d.data.photo || 'https://via.placeholder.com/70')
-      .attr('x', cardWidth / 2 - 35)
-      .attr('y', 20)
-      .attr('width', 70)
-      .attr('height', 70)
-      .attr('clip-path', 'circle(35px at 35px 35px)')
+      .attr('href', d.data.photo || 'https://via.placeholder.com/40')
+      .attr('x', cardWidth / 2 - 20)
+      .attr('y', 10)
+      .attr('width', 40)
+      .attr('height', 40)
+      .attr('clip-path', 'circle(20px at 20px 20px)')
 
+    // Nama
     card
       .append('text')
       .attr('x', cardWidth / 2)
-      .attr('y', 115)
+      .attr('y', 70)
       .attr('text-anchor', 'middle')
-      .attr('font-size', 14)
-      .attr('font-weight', 700)
+      .attr('font-size', 10)
+      .attr('font-weight', 600)
       .attr('fill', '#fff')
-      .text(d.data.kelamin === 'Laki-laki' ? 'Bapak ' + d.data.name : 'Ibu ' + d.data.name)
-
-    card
-      .append('text')
-      .attr('x', cardWidth / 2)
-      .attr('y', 140)
-      .attr('text-anchor', 'middle')
-      .attr('font-size', 12)
-      .attr('fill', '#fff')
-      .attr('opacity', 0.9)
-    // .text('Lahir: ' + (d.data.tgl_lahir || '-'))
-
-    card
-      .append('text')
-      .attr('x', cardWidth / 2)
-      .attr('y', 160)
-      .attr('text-anchor', 'middle')
-      .attr('font-size', 12)
-      .attr('fill', '#fff')
-      .attr('opacity', 0.9)
-    // .text('Status: ' + (d.data.status || '-'))
+      .text(d.data.kelamin === 'Laki-laki' ? 'Bpk. ' + d.data.name : 'Ibu. ' + d.data.name)
   })
-
   /* =========================
-     PASANGAN
-  ========================= */
+   PASANGAN (ULTRA COMPACT)
+========================= */
   node
     .filter((d) => d.data.spouse)
     .each(function (d) {
       const card = d3.select(this)
 
-      const cardWidth = 180
-      const cardHeight = 170
-      const offsetX = 230 // 🔥 lebih jauh biar aman
+      const cardWidth = 100
+      const cardHeight = 100
+      const offsetX = 130
 
       const spouseColor = d.data.spouse.kelamin === 'Laki-laki' ? '#1976d2' : '#e91e63'
 
@@ -207,44 +214,34 @@ const renderTree = async (data) => {
         .attr('width', cardWidth)
         .attr('height', cardHeight)
         .attr('x', offsetX)
-        .attr('rx', 18)
+        .attr('rx', 12)
         .attr('fill', spouseColor)
-        .attr('filter', 'drop-shadow(0px 6px 15px rgba(0,0,0,0.15))')
+        .attr('filter', 'drop-shadow(0px 3px 8px rgba(0,0,0,0.12))')
 
       card
         .append('image')
-        .attr('href', d.data.spouse.photo || 'https://via.placeholder.com/70')
-        .attr('x', offsetX + cardWidth / 2 - 35)
-        .attr('y', 20)
-        .attr('width', 70)
-        .attr('height', 70)
-        .attr('clip-path', 'circle(35px at 35px 35px)')
+        .attr('href', d.data.spouse.photo || 'https://via.placeholder.com/40')
+        .attr('x', offsetX + cardWidth / 2 - 20)
+        .attr('y', 10)
+        .attr('width', 40)
+        .attr('height', 40)
+        .attr('clip-path', 'circle(20px at 20px 20px)')
 
       card
         .append('text')
         .attr('x', offsetX + cardWidth / 2)
-        .attr('y', 115)
+        .attr('y', 70)
         .attr('text-anchor', 'middle')
-        .attr('font-size', 14)
-        .attr('font-weight', 700)
+        .attr('font-size', 10)
+        .attr('font-weight', 600)
         .attr('fill', '#fff')
         .text(
           d.data.spouse.kelamin === 'Laki-laki'
-            ? 'Bapak ' + d.data.spouse.name
-            : 'Ibu ' + d.data.spouse.name,
+            ? 'Bpk. ' + d.data.spouse.name
+            : 'Ibu. ' + d.data.spouse.name,
         )
 
-      card
-        .append('text')
-        .attr('x', offsetX + cardWidth / 2)
-        .attr('y', 140)
-        .attr('text-anchor', 'middle')
-        .attr('font-size', 12)
-        .attr('fill', '#fff')
-        .attr('opacity', 0.9)
-      // .text('Lahir: ' + (d.data.spouse.tgl_lahir || '-'))
-
-      // garis suami istri
+      // Garis suami istri
       card
         .append('line')
         .attr('x1', cardWidth)
@@ -260,6 +257,7 @@ const renderTree = async (data) => {
    LOAD DATA
 ========================= */
 onMounted(async () => {
+  await store.cariortu()
   await store.getlist()
 })
 

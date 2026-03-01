@@ -13,14 +13,30 @@
       <q-card-section>
         <q-form @submit.prevent="submitForm" class="q-gutter-md">
           <!-- Nama -->
-          <q-input
-            v-model="form.nama"
-            label="Nama Lengkap"
+          <q-input v-model="form.nama" label="Nama Lengkap" outlined dense />
+          <q-select
+            v-model="form.anakke"
+            :options="[
+              '1',
+              '2',
+              '3',
+              '4',
+              '5',
+              '6',
+              '7',
+              '8',
+              '9',
+              '10',
+              '11',
+              '12',
+              '13',
+              '14',
+              '15',
+            ]"
+            label="Anak Ke"
             outlined
             dense
-            :rules="[(val) => !!val || 'Nama wajib diisi']"
           />
-
           <!-- Jenis Kelamin -->
           <q-select
             v-model="form.kelamin"
@@ -49,27 +65,27 @@
           <q-input v-model="form.nohp" label="Nomor HP" outlined dense />
 
           <!-- Upload Foto -->
-          <q-file
+          <!-- <q-file
             v-model="form.photo"
             label="Upload Foto"
             outlined
             dense
             accept="image/*"
             @update:model-value="previewImage"
-          />
+          /> -->
 
           <!-- Preview -->
-          <div v-if="preview" class="text-center">
+          <!-- <div v-if="preview" class="text-center">
             <img
               :src="preview"
               style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover"
             />
-          </div>
+          </div> -->
 
           <!-- Tambah Pasangan -->
-          <q-toggle v-model="showSpouse" label="Tambah Pasangan" color="primary" />
+          <q-toggle v-model="form.showSpouse" label="Tambah Pasangan" color="primary" />
 
-          <div v-if="showSpouse" class="q-gutter-sm">
+          <div v-if="form.showSpouse" class="q-gutter-sm">
             <q-input v-model="form.spouse.nama" label="Nama Pasangan" outlined dense />
             <q-select
               v-model="form.spouse.kelamin"
@@ -88,19 +104,25 @@
             <q-input v-model="form.spouse.nohp" label="Nomor HP" outlined dense />
 
             <!-- Upload Foto -->
-            <q-file
+            <!-- <q-file
               v-model="form.spouse.photo"
               label="Upload Foto"
               outlined
               dense
               accept="image/*"
               @update:model-value="previewImage"
-            />
+            /> -->
           </div>
 
           <div class="row justify-end q-gutter-sm q-mt-md">
             <q-btn flat label="Batal" v-close-popup />
-            <q-btn color="primary" :label="isEdit ? 'Update' : 'Simpan'" type="submit" unelevated />
+            <q-btn
+              color="primary"
+              :label="isEdit ? 'Update' : 'Simpan'"
+              type="submit"
+              unelevated
+              :loading="store.loading"
+            />
           </div>
         </q-form>
       </q-card-section>
@@ -124,56 +146,58 @@ const dialogModel = computed({
 })
 
 const emit = defineEmits(['update:modelValue'])
-dialogModel.value = false
+// dialogModel.value = false
 
 const store = useTreeStore()
 
 // const isEdit = computed(() => !!props.editData)
 
 const form = ref({
+  id: '',
   nama: '',
+  anakke: '',
   kelamin: '',
   tanggal_lahir: '',
+  showSpouse: false,
   alamat: '',
   kota: '',
   nohp: '',
+  pernikahan_id: null,
   parent_id: null,
-  photo: null,
+  // photo: null,
   spouse: {
+    id: '',
     nama: '',
     kelamin: '',
     tanggal_lahir: '',
     nohp: '',
-    photo: null,
+    // photo: null,
   },
 })
 
-const preview = ref(null)
-const showSpouse = ref(false)
+// const preview = ref(null)
 
-function flattenTree(node, result = []) {
-  if (!node) return result
+// function flattenTree(node, result = []) {
+//   if (!node) return result
 
-  result.push({
-    id: node.id,
-    name: node.name,
-  })
+//   result.push({
+//     id: node.id,
+//     name: node.name,
+//   })
 
-  if (node.children && node.children.length) {
-    node.children.forEach((child) => flattenTree(child, result))
-  }
+//   if (node.children && node.children.length) {
+//     node.children.forEach((child) => flattenTree(child, result))
+//   }
 
-  return result
-}
+//   return result
+// }
 
 const parentOptions = computed(() => {
-  if (!store.items) return []
+  if (!Array.isArray(store.dataOrtu)) return []
 
-  const flat = flattenTree(store.items)
-
-  return flat.map((i) => ({
-    label: i.name,
-    value: i.id,
+  return store.dataOrtu.map((item) => ({
+    label: `Bpk. ${item.nama_suami} & Ibu. ${item.nama_istri}`,
+    value: item.suami_id,
   }))
 })
 
@@ -182,41 +206,86 @@ watch(
   (val) => {
     if (val) {
       form.value = JSON.parse(JSON.stringify(val))
-      showSpouse.value = !!val.spouse
+      form.value.showSpouse = !!val.spouse
     }
   },
 )
 
-const previewImage = (file) => {
-  if (file) {
-    preview.value = URL.createObjectURL(file)
-  }
-}
+// const previewImage = (file) => {
+//   if (file) {
+//     preview.value = URL.createObjectURL(file)
+//   }
+// }
 
 const submitForm = async () => {
   if (isEdit.value) {
-    await store.updateMember(form.value)
+    await store.addMember(form.value)
   } else {
     await store.addMember(form.value)
   }
 
   emit('update:modelValue', false)
 }
-console.log(props.member, 'sasasa')
+// watchEffect(() => {
+//   console.log('pernikahan:', store.dataOrtu)
+//   console.log('OPTIONS:', parentOptions.value)
+// })
 watch(
   () => props.member,
   (val) => {
+    console.log('member:', val)
     if (val) {
+      form.value.id = val.id
       form.value.nama = val.name
+      form.value.anakke = val.anakke
       form.value.kelamin = val.kelamin
       form.value.tanggal_lahir = val.tanggal_lahir
       form.value.alamat = val.alamat
       form.value.kota = val.kota
+      form.value.pernikahan_id = val.pernikahan_id
       form.value.nohp = val.nohp
       form.value.parent_id = val.parent_id
-      form.value.photo = val.photo
+      form.value.showSpouse = val.spouse === null ? false : true
+      form.value.spouse.id = val.spouse?.id || ''
+      form.value.spouse.nama = val.spouse?.name || ''
+      form.value.spouse.kelamin = val.spouse?.kelamin || ''
+      form.value.spouse.tanggal_lahir = val.spouse?.tanggal_lahir || ''
+      form.value.spouse.nohp = val.spouse?.nohp || ''
+      // form.value.photo = val.photo
     }
   },
   { immediate: true },
 )
+
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (val && !props.member) {
+      resetForm()
+    }
+  },
+)
+
+const resetForm = () => {
+  form.value = {
+    id: '',
+    nama: '',
+    anakke: '',
+    kelamin: '',
+    tanggal_lahir: '',
+    showSpouse: false,
+    alamat: '',
+    pernikahan_id: null,
+    kota: '',
+    nohp: '',
+    parent_id: null,
+    spouse: {
+      id: '',
+      nama: '',
+      kelamin: '',
+      tanggal_lahir: '',
+      nohp: '',
+    },
+  }
+}
 </script>
