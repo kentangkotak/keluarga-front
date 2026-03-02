@@ -11,6 +11,12 @@ export const useTreeStore = defineStore('tree-store', {
     params: {
       id: 1,
     },
+    formphotos: {
+      id_anggota: null,
+      photo: null,
+      spouse_id: null,
+      photospouse: null,
+    },
   }),
   actions: {
     getlist() {
@@ -81,6 +87,31 @@ export const useTreeStore = defineStore('tree-store', {
       } finally {
         this.loading = false
       }
+    },
+    uploadFoto(formData) {
+      this.loading = true
+
+      return new Promise((resolve, reject) => {
+        api
+          .post('/upload-foto', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          })
+          .then((response) => {
+            if (response.data.success === true) {
+              notifySuccess('Data Berhasil Disimpan')
+            } else {
+              notifyError('Data Gagal Disimpan')
+            }
+            this.loading = false
+            resolve(response.data)
+          })
+          .catch((error) => {
+            this.loading = false
+            reject(error)
+          })
+      })
     },
   },
 })

@@ -10,7 +10,7 @@
             color="black"
             icon="add"
             rounded
-            @click="tambahfoto(form.value)"
+            @click="tambahfoto()"
           />
         </div>
         <q-btn icon="close" flat round dense v-close-popup />
@@ -136,11 +136,13 @@
       </q-card-section>
     </q-card>
   </q-dialog>
+  <FormdialogFoto v-model="showDialogphotos" :member="form" />
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useTreeStore } from 'src/stores/tree'
+import FormdialogFoto from './DialogFoto.vue'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -152,6 +154,8 @@ const dialogModel = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val),
 })
+
+const showDialogphotos = ref(false)
 
 const emit = defineEmits(['update:modelValue'])
 // dialogModel.value = false
@@ -297,7 +301,7 @@ const resetForm = () => {
   }
 }
 
-function tambahfoto(val) {
-  console.log('tambah foto', val)
+function tambahfoto() {
+  showDialogphotos.value = true
 }
 </script>
