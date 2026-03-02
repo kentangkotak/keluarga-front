@@ -20,11 +20,11 @@
             <div class="menu-desc">Lihat dan edit data profil Anda</div>
           </q-card-section>
         </q-card>
-        <q-card class="menu-card" clickable @click="$router.push('/anggotakeluarga')">
+        <q-card class="menu-card" clickable @click="$router.push('/albumkeluarga')">
           <q-card-section class="text-center">
             <q-icon name="person" size="42px" class="menu-icon" />
-            <div class="menu-title">Anggota Keluarga</div>
-            <div class="menu-desc">Lihat dan edit data Anggota Keluarga Anda</div>
+            <div class="menu-title">Album Keluarga</div>
+            <div class="menu-desc">Lihat Album Anggota Keluarga Anda</div>
           </q-card-section>
         </q-card>
 

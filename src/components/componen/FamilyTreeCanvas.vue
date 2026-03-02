@@ -25,7 +25,7 @@
       </div>
       <div class="col-6">
         <q-btn
-          label="Tambah Anggota"
+          label="Tambah"
           color="positive"
           icon="add"
           rounded
@@ -84,7 +84,7 @@ const renderTree = async (data) => {
   d3.select(canvas.value).selectAll('*').remove()
 
   const width = canvas.value.scrollWidth || canvas.value.clientWidth
-  const height = 1200
+  const height = canvas.value.clientHeight || window.innerHeight
 
   const svg = d3.select(canvas.value).append('svg').attr('width', width).attr('height', height)
 
@@ -259,6 +259,10 @@ const renderTree = async (data) => {
 onMounted(async () => {
   await store.cariortu()
   await store.getlist()
+
+  window.addEventListener('resize', () => {
+    if (store.items) renderTree(store.items)
+  })
 })
 
 /* =========================
@@ -274,6 +278,11 @@ watch(
 </script>
 
 <style>
+.tree-container {
+  flex: 1;
+  width: 100%;
+  overflow: auto; /* GANTI dari hidden ke auto */
+}
 .tree-wrapper {
   position: relative;
   height: 100vh;

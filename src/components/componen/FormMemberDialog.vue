@@ -4,6 +4,14 @@
       <q-card-section class="row items-center justify-between">
         <div class="text-h6">
           {{ isEdit ? 'Edit Anggota' : 'Tambah Anggota Keluarga' }}
+          <q-btn
+            v-if="isEdit"
+            label="Foto"
+            color="black"
+            icon="add"
+            rounded
+            @click="tambahfoto(form.value)"
+          />
         </div>
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
@@ -287,5 +295,9 @@ const resetForm = () => {
       nohp: '',
     },
   }
+}
+
+function tambahfoto(val) {
+  console.log('tambah foto', val)
 }
 </script>
