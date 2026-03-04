@@ -174,7 +174,17 @@ const renderTree = async (data) => {
     // Foto
     card
       .append('image')
-      .attr('href', d.data.photo || 'https://via.placeholder.com/40')
+      .attr('href', () => {
+        if (d.data.photo && d.data.photo !== '') {
+          return d.data.photo
+        }
+
+        if (d.data.kelamin === 'Laki-laki') {
+          return 'https://i.pravatar.cc/100?img=8'
+        }
+
+        return 'https://i.pravatar.cc/100?img=5'
+      })
       .attr('x', cardWidth / 2 - 20)
       .attr('y', 10)
       .attr('width', 40)
@@ -182,7 +192,15 @@ const renderTree = async (data) => {
       .attr('clip-path', 'circle(20px at 20px 20px)')
 
     // Nama & Sapaan
-    const greeting = d.data.kelamin === 'Laki-laki' ? 'Bpk.' : 'Ibu.'
+    const hasSpouse = !!d.data.spouse?.id
+
+    let greeting = ''
+
+    if (hasSpouse) {
+      greeting = d.data.kelamin === 'Laki-laki' ? 'Bpk.' : 'Ibu.'
+    } else {
+      greeting = 'Kakak'
+    }
     const nameText = d.data.name || ''
     const maxCharsPerLine = 10
     const lineHeight = 10 // <== atur jarak vertikal per baris
@@ -253,7 +271,17 @@ const renderTree = async (data) => {
 
       card
         .append('image')
-        .attr('href', d.data.spouse.photo || 'https://via.placeholder.com/40')
+        .attr('href', () => {
+          if (d.data.spouse.photo && d.data.spouse.photo !== '') {
+            return d.data.spouse.photo
+          }
+
+          if (d.data.spouse.kelamin === 'Laki-laki') {
+            return 'https://i.pravatar.cc/100?img=8'
+          }
+
+          return 'https://i.pravatar.cc/100?img=5'
+        })
         .attr('x', offsetX + cardWidth / 2 - 20)
         .attr('y', 10)
         .attr('width', 40)

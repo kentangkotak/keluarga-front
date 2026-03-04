@@ -60,6 +60,9 @@
         </q-card>
       </div>
     </div>
+    <div class="footer">
+      © {{ new Date().getFullYear() }} Udumbara Informatika. All rights reserved.
+    </div>
   </q-page>
 </template>
 
@@ -239,5 +242,14 @@ const logout = () => {
   border-radius: 10px;
   padding: 4px 16px;
   font-size: 0.85rem;
+}
+
+.home-page {
+  background: linear-gradient(135deg, #4e73df, #1cc88a);
+  min-height: 100vh;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 </style>
