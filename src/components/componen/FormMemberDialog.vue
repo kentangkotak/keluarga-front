@@ -28,8 +28,8 @@
         <q-form @submit.prevent="submitForm">
           <!-- Section: Data Anggota -->
           <div class="section-label">👤 Data Anggota</div>
-          <div class="form-grid">
-            <q-input v-model="form.nama" label="Nama Lengkap" outlined dense class="col-span-2" />
+          <div class="form-fields">
+            <q-input v-model="form.nama" label="Nama Lengkap" outlined dense />
             <q-select
               v-model="form.kelamin"
               :options="['Laki-laki', 'Perempuan']"
@@ -66,7 +66,6 @@
               type="date"
               outlined
               dense
-              class="col-span-2"
             />
             <q-select
               v-model="form.parent_id"
@@ -76,16 +75,15 @@
               dense
               emit-value
               map-options
-              class="col-span-2"
             />
           </div>
 
           <!-- Section: Kontak & Alamat -->
           <div class="section-label">📍 Kontak & Alamat</div>
-          <div class="form-grid">
+          <div class="form-fields">
             <q-input v-model="form.nohp" label="Nomor HP" outlined dense />
             <q-input v-model="form.kota" label="Kota" outlined dense />
-            <q-input v-model="form.alamat" label="Alamat" outlined dense class="col-span-2" />
+            <q-input v-model="form.alamat" label="Alamat" outlined dense />
           </div>
 
           <!-- Toggle Pasangan -->
@@ -96,14 +94,8 @@
           <!-- Section: Data Pasangan -->
           <div v-if="form.showSpouse" class="spouse-section">
             <div class="section-label">💍 Data Pasangan</div>
-            <div class="form-grid">
-              <q-input
-                v-model="form.spouse.nama"
-                label="Nama Pasangan"
-                outlined
-                dense
-                class="col-span-2"
-              />
+            <div class="form-fields">
+              <q-input v-model="form.spouse.nama" label="Nama Pasangan" outlined dense />
               <q-select
                 v-model="form.spouse.kelamin"
                 :options="['Laki-laki', 'Perempuan']"
@@ -118,13 +110,7 @@
                 outlined
                 dense
               />
-              <q-input
-                v-model="form.spouse.nohp"
-                label="Nomor HP"
-                outlined
-                dense
-                class="col-span-2"
-              />
+              <q-input v-model="form.spouse.nohp" label="Nomor HP" outlined dense />
             </div>
           </div>
 
@@ -150,8 +136,11 @@
 .form-card {
   width: 580px;
   max-width: 95vw;
+  max-height: 90vh;
   border-radius: 20px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-header {
@@ -191,6 +180,8 @@
 
 .form-body {
   padding: 20px 24px 16px;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .section-label {
@@ -204,14 +195,10 @@
   border-bottom: 2px solid #eff6ff;
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.col-span-2 {
-  grid-column: span 2;
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .spouse-toggle {

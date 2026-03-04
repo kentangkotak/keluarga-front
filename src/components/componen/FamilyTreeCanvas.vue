@@ -43,7 +43,7 @@
       <div v-if="store.loading" class="loading-overlay">
         <div class="loading-card">
           <div class="spinner"></div>
-          <div class="loading-text">Memuat Data...</div>
+          <!-- <div class="loading-text">Memuat Data...</div> -->
         </div>
       </div>
     </transition>
