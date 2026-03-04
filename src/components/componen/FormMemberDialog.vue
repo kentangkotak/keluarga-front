@@ -1,134 +1,141 @@
 <template>
   <q-dialog v-model="dialogModel" persistent>
-    <q-card style="width: 600px; max-width: 95vw">
-      <q-card-section class="row items-center justify-between">
-        <div class="text-h6">
-          {{ isEdit ? 'Edit Anggota' : 'Tambah Anggota Keluarga' }}
+    <q-card class="form-card">
+      <!-- Header -->
+      <div class="form-header">
+        <div class="header-left">
+          <q-icon name="people" size="22px" color="white" />
+          <span class="header-title">{{
+            isEdit ? 'Edit Anggota' : 'Tambah Anggota Keluarga'
+          }}</span>
+        </div>
+        <div class="header-right">
           <q-btn
             v-if="isEdit"
             label="Foto"
-            color="black"
-            icon="add"
+            icon="add_a_photo"
+            flat
             rounded
+            dense
+            class="foto-btn"
             @click="tambahfoto()"
           />
+          <q-btn icon="close" flat round dense color="white" v-close-popup />
         </div>
-        <q-btn icon="close" flat round dense v-close-popup />
-      </q-card-section>
+      </div>
 
-      <q-separator />
-
-      <q-card-section>
-        <q-form @submit.prevent="submitForm" class="q-gutter-md">
-          <!-- Nama -->
-          <q-input v-model="form.nama" label="Nama Lengkap" outlined dense />
-          <q-select
-            v-model="form.anakke"
-            :options="[
-              '1',
-              '2',
-              '3',
-              '4',
-              '5',
-              '6',
-              '7',
-              '8',
-              '9',
-              '10',
-              '11',
-              '12',
-              '13',
-              '14',
-              '15',
-            ]"
-            label="Anak Ke"
-            outlined
-            dense
-          />
-          <!-- Jenis Kelamin -->
-          <q-select
-            v-model="form.kelamin"
-            :options="['Laki-laki', 'Perempuan']"
-            label="Jenis Kelamin"
-            outlined
-            dense
-          />
-
-          <!-- Tanggal Lahir -->
-          <q-input v-model="form.tanggal_lahir" label="Tanggal Lahir" type="date" outlined dense />
-
-          <!-- Parent -->
-          <q-select
-            v-model="form.parent_id"
-            :options="parentOptions"
-            label="Pilih Orang Tua"
-            outlined
-            dense
-            emit-value
-            map-options
-          />
-
-          <q-input v-model="form.alamat" label="Alamat" outlined dense />
-          <q-input v-model="form.kota" label="Kota" outlined dense />
-          <q-input v-model="form.nohp" label="Nomor HP" outlined dense />
-
-          <!-- Upload Foto -->
-          <!-- <q-file
-            v-model="form.photo"
-            label="Upload Foto"
-            outlined
-            dense
-            accept="image/*"
-            @update:model-value="previewImage"
-          /> -->
-
-          <!-- Preview -->
-          <!-- <div v-if="preview" class="text-center">
-            <img
-              :src="preview"
-              style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover"
-            />
-          </div> -->
-
-          <!-- Tambah Pasangan -->
-          <q-toggle v-model="form.showSpouse" label="Tambah Pasangan" color="primary" />
-
-          <div v-if="form.showSpouse" class="q-gutter-sm">
-            <q-input v-model="form.spouse.nama" label="Nama Pasangan" outlined dense />
+      <q-card-section class="form-body">
+        <q-form @submit.prevent="submitForm">
+          <!-- Section: Data Anggota -->
+          <div class="section-label">👤 Data Anggota</div>
+          <div class="form-grid">
+            <q-input v-model="form.nama" label="Nama Lengkap" outlined dense class="col-span-2" />
             <q-select
-              v-model="form.spouse.kelamin"
+              v-model="form.kelamin"
               :options="['Laki-laki', 'Perempuan']"
-              label="Jenis Kelamin Pasangan"
+              label="Jenis Kelamin"
+              outlined
+              dense
+            />
+            <q-select
+              v-model="form.anakke"
+              :options="[
+                '1',
+                '2',
+                '3',
+                '4',
+                '5',
+                '6',
+                '7',
+                '8',
+                '9',
+                '10',
+                '11',
+                '12',
+                '13',
+                '14',
+                '15',
+              ]"
+              label="Anak Ke"
               outlined
               dense
             />
             <q-input
-              v-model="form.spouse.tanggal_lahir"
+              v-model="form.tanggal_lahir"
               label="Tanggal Lahir"
               type="date"
               outlined
               dense
+              class="col-span-2"
             />
-            <q-input v-model="form.spouse.nohp" label="Nomor HP" outlined dense />
-
-            <!-- Upload Foto -->
-            <!-- <q-file
-              v-model="form.spouse.photo"
-              label="Upload Foto"
+            <q-select
+              v-model="form.parent_id"
+              :options="parentOptions"
+              label="Pilih Orang Tua"
               outlined
               dense
-              accept="image/*"
-              @update:model-value="previewImage"
-            /> -->
+              emit-value
+              map-options
+              class="col-span-2"
+            />
           </div>
 
-          <div class="row justify-end q-gutter-sm q-mt-md">
-            <q-btn flat label="Batal" v-close-popup />
+          <!-- Section: Kontak & Alamat -->
+          <div class="section-label">📍 Kontak & Alamat</div>
+          <div class="form-grid">
+            <q-input v-model="form.nohp" label="Nomor HP" outlined dense />
+            <q-input v-model="form.kota" label="Kota" outlined dense />
+            <q-input v-model="form.alamat" label="Alamat" outlined dense class="col-span-2" />
+          </div>
+
+          <!-- Toggle Pasangan -->
+          <div class="spouse-toggle">
+            <q-toggle v-model="form.showSpouse" label="Tambah Pasangan" color="primary" />
+          </div>
+
+          <!-- Section: Data Pasangan -->
+          <div v-if="form.showSpouse" class="spouse-section">
+            <div class="section-label">💍 Data Pasangan</div>
+            <div class="form-grid">
+              <q-input
+                v-model="form.spouse.nama"
+                label="Nama Pasangan"
+                outlined
+                dense
+                class="col-span-2"
+              />
+              <q-select
+                v-model="form.spouse.kelamin"
+                :options="['Laki-laki', 'Perempuan']"
+                label="Jenis Kelamin"
+                outlined
+                dense
+              />
+              <q-input
+                v-model="form.spouse.tanggal_lahir"
+                label="Tanggal Lahir"
+                type="date"
+                outlined
+                dense
+              />
+              <q-input
+                v-model="form.spouse.nohp"
+                label="Nomor HP"
+                outlined
+                dense
+                class="col-span-2"
+              />
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <q-btn flat label="Batal" class="btn-cancel" v-close-popup />
             <q-btn
-              color="primary"
               :label="isEdit ? 'Update' : 'Simpan'"
               type="submit"
               unelevated
+              class="btn-submit"
               :loading="store.loading"
             />
           </div>
@@ -138,6 +145,107 @@
   </q-dialog>
   <FormdialogFoto v-model="showDialogphotos" :member="form" />
 </template>
+
+<style scoped>
+.form-card {
+  width: 580px;
+  max-width: 95vw;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.form-header {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-title {
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.foto-btn {
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  padding: 4px 12px;
+}
+
+.form-body {
+  padding: 20px 24px 16px;
+}
+
+.section-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #2563eb;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 16px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #eff6ff;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.col-span-2 {
+  grid-column: span 2;
+}
+
+.spouse-toggle {
+  margin: 16px 0 4px;
+}
+
+.spouse-section {
+  background: #f8faff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 4px 14px 14px;
+  margin-bottom: 4px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-cancel {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 6px 24px;
+}
+</style>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
@@ -256,6 +364,7 @@ watch(
       form.value.kota = val.kota
       form.value.pernikahan_id = val.pernikahan_id
       form.value.nohp = val.nohp
+      form.value.photo = val.photo
       form.value.parent_id = val.parent_id
       form.value.showSpouse = val.spouse === null ? false : true
       form.value.spouse.id = val.spouse?.id || ''
@@ -263,6 +372,7 @@ watch(
       form.value.spouse.kelamin = val.spouse?.kelamin || ''
       form.value.spouse.tanggal_lahir = val.spouse?.tanggal_lahir || ''
       form.value.spouse.nohp = val.spouse?.nohp || ''
+      form.value.spouse.photo = val.spouse?.photo || ''
       // form.value.photo = val.photo
     }
   },

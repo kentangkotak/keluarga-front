@@ -44,7 +44,6 @@ export const useTreeStore = defineStore('tree-store', {
           .then((response) => {
             if (response.data.success === true) {
               this.items = response.data?.data?.original
-              // console.log('RESPONSE:', response.data?.ortu?.original)
               this.dataOrtu = response.data?.ortu?.original
               notifySuccess('Data Berhasil Disimpan')
             } else {
@@ -100,6 +99,9 @@ export const useTreeStore = defineStore('tree-store', {
           })
           .then((response) => {
             if (response.data.success === true) {
+              this.items = response.data?.data?.original
+              this.dataOrtu = response.data?.ortu?.original
+              this
               notifySuccess('Data Berhasil Disimpan')
             } else {
               notifyError('Data Gagal Disimpan')
@@ -109,6 +111,20 @@ export const useTreeStore = defineStore('tree-store', {
           })
           .catch((error) => {
             this.loading = false
+
+            if (error.response) {
+              // Error dari server
+              if (error.response.status === 413) {
+                notifyError('Ukuran file terlalu besar. Maksimal 5MB.')
+              } else {
+                notifyError('Terjadi kesalahan pada server.')
+              }
+            } else if (error.request) {
+              // Request terkirim tapi tidak ada response
+              notifyError('Server tidak merespons.')
+            } else {
+              notifyError('Terjadi kesalahan.')
+            }
             reject(error)
           })
       })

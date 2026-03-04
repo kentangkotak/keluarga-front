@@ -154,10 +154,8 @@ const renderTree = async (data) => {
 ========================= */
   node.each(function (d) {
     const card = d3.select(this)
-
     const cardWidth = 100
     const cardHeight = 100
-
     const bgColor = d.data.kelamin === 'Laki-laki' ? '#1976d2' : '#e91e63'
 
     card.style('cursor', 'pointer').on('click', () => {
@@ -172,7 +170,6 @@ const renderTree = async (data) => {
       .attr('height', cardHeight)
       .attr('rx', 12)
       .attr('fill', bgColor)
-      .attr('filter', 'drop-shadow(0px 3px 8px rgba(0,0,0,0.12))')
 
     // Foto
     card
@@ -184,16 +181,52 @@ const renderTree = async (data) => {
       .attr('height', 40)
       .attr('clip-path', 'circle(20px at 20px 20px)')
 
-    // Nama
-    card
+    // Nama & Sapaan
+    const greeting = d.data.kelamin === 'Laki-laki' ? 'Bpk.' : 'Ibu.'
+    const nameText = d.data.name || ''
+    const maxCharsPerLine = 10
+    const lineHeight = 10 // <== atur jarak vertikal per baris
+
+    const textElem = card
       .append('text')
       .attr('x', cardWidth / 2)
-      .attr('y', 70)
+      .attr('y', 65)
       .attr('text-anchor', 'middle')
       .attr('font-size', 10)
       .attr('font-weight', 600)
       .attr('fill', '#fff')
-      .text(d.data.kelamin === 'Laki-laki' ? 'Bpk. ' + d.data.name : 'Ibu. ' + d.data.name)
+
+    // Baris 1: Sapaan (dy = 0)
+    textElem
+      .append('tspan')
+      .text(greeting)
+      .attr('x', cardWidth / 2)
+      .attr('dy', 0)
+
+    // Baris 2+: Nama wrap (dy = lineHeight)
+    let line = ''
+    // eslint-disable-next-line no-unused-vars
+    let lineIndex = 1
+    nameText.split(' ').forEach((word) => {
+      if ((line + ' ' + word).trim().length <= maxCharsPerLine) {
+        line += (line ? ' ' : '') + word
+      } else {
+        textElem
+          .append('tspan')
+          .text(line)
+          .attr('x', cardWidth / 2)
+          .attr('dy', lineHeight)
+        line = word
+        lineIndex++
+      }
+    })
+    if (line) {
+      textElem
+        .append('tspan')
+        .text(line)
+        .attr('x', cardWidth / 2)
+        .attr('dy', lineHeight)
+    }
   })
   /* =========================
    PASANGAN (ULTRA COMPACT)
@@ -227,19 +260,50 @@ const renderTree = async (data) => {
         .attr('height', 40)
         .attr('clip-path', 'circle(20px at 20px 20px)')
 
-      card
+      const spouseGreeting = d.data.spouse.kelamin === 'Laki-laki' ? 'Bpk.' : 'Ibu.'
+      const spouseText = d.data.spouse.name || ''
+      const lineHeight = 10
+      const maxCharsPerLine = 10
+      const textElem = card
         .append('text')
         .attr('x', offsetX + cardWidth / 2)
-        .attr('y', 70)
+        .attr('y', 65)
         .attr('text-anchor', 'middle')
         .attr('font-size', 10)
         .attr('font-weight', 600)
         .attr('fill', '#fff')
-        .text(
-          d.data.spouse.kelamin === 'Laki-laki'
-            ? 'Bpk. ' + d.data.spouse.name
-            : 'Ibu. ' + d.data.spouse.name,
-        )
+
+      // Baris 1: Sapaan
+      textElem
+        .append('tspan')
+        .text(spouseGreeting)
+        .attr('x', offsetX + cardWidth / 2)
+        .attr('dy', 0)
+
+      // Baris 2+: Nama wrap
+      let line = ''
+      // eslint-disable-next-line no-unused-vars
+      let lineIndex = 1
+      spouseText.split(' ').forEach((word) => {
+        if ((line + ' ' + word).trim().length <= maxCharsPerLine) {
+          line += (line ? ' ' : '') + word
+        } else {
+          textElem
+            .append('tspan')
+            .text(line)
+            .attr('x', offsetX + cardWidth / 2)
+            .attr('dy', lineHeight)
+          line = word
+          lineIndex++
+        }
+      })
+      if (line) {
+        textElem
+          .append('tspan')
+          .text(line)
+          .attr('x', offsetX + cardWidth / 2)
+          .attr('dy', lineHeight)
+      }
 
       // Garis suami istri
       card
