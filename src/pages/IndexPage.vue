@@ -11,6 +11,21 @@
         <p class="subtitle">Kelola dan lihat silsilah keluarga Anda dengan mudah</p>
       </div>
 
+      <!-- INSTALL BANNER -->
+      <div v-if="showInstallBanner" class="install-banner">
+        <div class="install-banner-left">
+          <q-icon name="install_mobile" size="28px" color="white" />
+          <div>
+            <div class="install-title">Pasang ke Homescreen</div>
+            <div class="install-sub">Akses lebih cepat tanpa buka browser</div>
+          </div>
+        </div>
+        <div class="install-banner-right">
+          <q-btn flat dense round icon="close" color="white" @click="showInstallBanner = false" />
+          <q-btn unelevated dense label="Pasang" class="install-btn" @click="installApp" />
+        </div>
+      </div>
+
       <!-- MENU CARDS -->
       <div class="menu-grid">
         <q-card class="menu-card" clickable @click="$router.push('/profil')">
@@ -49,11 +64,33 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 
 const router = useRouter()
 const $q = useQuasar()
+
+const showInstallBanner = ref(false)
+let deferredPrompt = null
+
+onMounted(() => {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault()
+    deferredPrompt = e
+    showInstallBanner.value = true
+  })
+})
+
+const installApp = async () => {
+  if (!deferredPrompt) return
+  deferredPrompt.prompt()
+  const { outcome } = await deferredPrompt.userChoice
+  if (outcome === 'accepted') {
+    showInstallBanner.value = false
+  }
+  deferredPrompt = null
+}
 
 const logout = () => {
   $q.dialog({
@@ -154,5 +191,53 @@ const logout = () => {
 
 .logout-icon {
   color: #e74a3b;
+}
+
+/* Install Banner */
+.install-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  gap: 12px;
+}
+
+.install-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+}
+
+.install-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.install-sub {
+  font-size: 0.78rem;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+
+.install-banner-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.install-btn {
+  background: white;
+  color: #4e73df;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 4px 16px;
+  font-size: 0.85rem;
 }
 </style>
