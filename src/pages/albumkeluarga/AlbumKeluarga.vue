@@ -54,6 +54,55 @@
             </div>
           </div>
 
+          <!-- Info Section -->
+          <div class="info-section" v-if="pages[currentPage]">
+            <!-- Info Parent -->
+            <div class="info-block">
+              <div class="info-name">{{ pages[currentPage].parent.name }}</div>
+              <div class="info-row" v-if="pages[currentPage].parent.tanggal_lahir">
+                <span class="info-icon">🎂</span>
+                <span class="info-text">{{
+                  formatDate(pages[currentPage].parent.tanggal_lahir)
+                }}</span>
+              </div>
+              <div class="info-row" v-if="pages[currentPage].parent.nohp">
+                <span class="info-icon">📞</span>
+                <span class="info-text">{{ pages[currentPage].parent.nohp }}</span>
+              </div>
+              <div class="info-row" v-if="pages[currentPage].parent.kota">
+                <span class="info-icon">🏙️</span>
+                <span class="info-text">{{ pages[currentPage].parent.kota }}</span>
+              </div>
+              <div class="info-row" v-if="pages[currentPage].parent.alamat">
+                <span class="info-icon">📍</span>
+                <span class="info-text">{{ pages[currentPage].parent.alamat }}</span>
+              </div>
+            </div>
+
+            <!-- Info Spouse -->
+            <div class="info-block" v-if="pages[currentPage].spouse">
+              <div class="info-name">{{ pages[currentPage].spouse.name }}</div>
+              <div class="info-row" v-if="pages[currentPage].spouse.tanggal_lahir">
+                <span class="info-icon">🎂</span>
+                <span class="info-text">{{
+                  formatDate(pages[currentPage].spouse.tanggal_lahir)
+                }}</span>
+              </div>
+              <div class="info-row" v-if="pages[currentPage].spouse.nohp">
+                <span class="info-icon">📞</span>
+                <span class="info-text">{{ pages[currentPage].spouse.nohp }}</span>
+              </div>
+              <div class="info-row" v-if="pages[currentPage].spouse.kota">
+                <span class="info-icon">🏙️</span>
+                <span class="info-text">{{ pages[currentPage].spouse.kota }}</span>
+              </div>
+              <div class="info-row" v-if="pages[currentPage].spouse.alamat">
+                <span class="info-icon">📍</span>
+                <span class="info-text">{{ pages[currentPage].spouse.alamat }}</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Children -->
           <div v-if="pages[currentPage]?.children?.length" class="children-section">
             <p class="children-label">👨‍👩‍👧‍👦 Anak-anak</p>
@@ -155,6 +204,12 @@ onMounted(async () => {
   pages.value = buildPages(store.items)
   loading.value = false // selesai loading
 })
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '-'
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+}
 
 const goToChild = (childId) => {
   const index = pages.value.findIndex((p) => p.parent.id === childId)
@@ -361,6 +416,50 @@ const goToChild = (childId) => {
   50% {
     transform: scale(1.2);
   }
+}
+
+/* Info Section */
+.info-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.info-block {
+  background: #f8faff;
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #2563eb;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-icon {
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.info-text {
+  font-size: 0.82rem;
+  color: #334155;
+  font-weight: 500;
 }
 
 /* Children */
