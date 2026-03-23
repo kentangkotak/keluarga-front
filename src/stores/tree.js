@@ -27,6 +27,7 @@ export const useTreeStore = defineStore('tree-store', {
           .then((response) => {
             this.items = response.data
             this.loading = false
+            this.cariortu()
             resolve(response.data)
           })
           .catch((error) => {
@@ -59,7 +60,7 @@ export const useTreeStore = defineStore('tree-store', {
       })
     },
     async cariortu() {
-      this.loading = true
+      // this.loading = true
       try {
         const response = await api.get('/cari-ortu')
 
@@ -84,7 +85,7 @@ export const useTreeStore = defineStore('tree-store', {
           console.error(error)
         }
       } finally {
-        this.loading = false
+        // this.loading = false
       }
     },
     uploadFoto(formData) {
@@ -98,6 +99,7 @@ export const useTreeStore = defineStore('tree-store', {
             },
           })
           .then((response) => {
+            console.log('Upload response:', response)
             if (response.data.success === true) {
               this.items = response.data?.data?.original
               this.dataOrtu = response.data?.ortu?.original
@@ -113,18 +115,17 @@ export const useTreeStore = defineStore('tree-store', {
             this.loading = false
 
             if (error.response) {
-              // Error dari server
-              if (error.response.status === 413) {
-                notifyError('Ukuran file terlalu besar. Maksimal 5MB.')
+              if (error.response.status === 422) {
+                notifyError('Ukuran file terlalu besar, maksimal 2MB.') // 🔥 ambil pesan Laravel
               } else {
                 notifyError('Terjadi kesalahan pada server.')
               }
             } else if (error.request) {
-              // Request terkirim tapi tidak ada response
               notifyError('Server tidak merespons.')
             } else {
               notifyError('Terjadi kesalahan.')
             }
+
             reject(error)
           })
       })

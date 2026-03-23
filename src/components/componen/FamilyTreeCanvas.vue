@@ -349,7 +349,7 @@ const renderTree = async (data) => {
    LOAD DATA
 ========================= */
 onMounted(async () => {
-  await store.cariortu()
+  // await store.cariortu()
   await store.getlist()
 
   window.addEventListener('resize', () => {
